@@ -104,14 +104,19 @@ export function Chat() {
 
   const taskId = useMemo(() => {
     if (taskIdParam) return taskIdParam;
+    // Find a planning/chat task by title, or fall back to any CEO-assigned task
     const planningTask = issues?.find(
       (i) =>
         i.title.toLowerCase().includes("hiring plan") ||
         i.title.toLowerCase().includes("build hiring plan") ||
-        i.title.toLowerCase().includes("plan ai agents"),
+        i.title.toLowerCase().includes("plan ai agents") ||
+        i.title.toLowerCase().includes("chat with ceo"),
     );
-    return planningTask?.id ?? null;
-  }, [taskIdParam, issues]);
+    if (planningTask) return planningTask.id;
+    // Fall back: any task assigned to the CEO agent
+    const ceoTask = ceoAgent && issues?.find((i) => i.assigneeAgentId === ceoAgent.id);
+    return ceoTask?.id ?? null;
+  }, [taskIdParam, issues, ceoAgent]);
 
   // Build conversations list from CEO-assigned issues
   const conversations: ChatConversation[] = useMemo(() => {
@@ -156,29 +161,42 @@ export function Chat() {
         planMarkdown = doc.body ?? "";
       } catch { /* fallback */ }
 
-      if (planMarkdown) {
-        const roles = parseRolesFromPlan(planMarkdown);
-        for (const role of roles) {
+      // Parse plan and create hire tasks
+      const roles = planMarkdown ? parseRolesFromPlan(planMarkdown) : [];
+      for (const role of roles) {
+        try {
           await issuesApi.create(selectedCompanyId, {
             title: `Hire: ${role.name}`,
             description: `Hire a ${role.name} for the company.\n\n${role.spec}`,
             assigneeAgentId: ceoAgent.id,
             status: "todo",
           });
-        }
-        queryClient.invalidateQueries({ queryKey: queryKeys.issues.list(selectedCompanyId) });
-
-        // Confirmation in chat
-        await issuesApi.addComment(
-          taskId,
-          `Plan approved! ${roles.length} hire task${roles.length === 1 ? "" : "s"} created. Let's build the team.`,
-          false, false,
-        );
-        queryClient.invalidateQueries({ queryKey: queryKeys.issues.comments(taskId) });
+        } catch { /* skip failed task creation */ }
       }
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.list(selectedCompanyId) });
+
+      // Confirmation in chat
+      try {
+        await issuesApi.addComment(taskId, `Plan approved! ${roles.length} hire task${roles.length === 1 ? "" : "s"} created.`);
+      } catch { /* non-critical */ }
+      queryClient.invalidateQueries({ queryKey: queryKeys.issues.comments(taskId) });
+
+      // Trigger CEO to respond immediately via stream endpoint
+      fetch(`/api/agents/${ceoAgent.id}/chat/canned`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId,
+          message: `Great news! The plan has been approved. I've created ${roles.length} hire task${roles.length === 1 ? "" : "s"} and I'll start working on them right away. You can track progress in the Tasks view.`,
+        }),
+      }).then(() => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.issues.comments(taskId) });
+      }).catch(() => {});
 
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.workProducts(taskId) });
-    } catch { /* non-critical */ }
+    } catch (err) {
+      console.error("Approve failed:", err);
+    }
   }, [taskId, selectedCompanyId, ceoAgent, queryClient]);
 
   // Reject: update work product to changes_requested, tell CEO to revise

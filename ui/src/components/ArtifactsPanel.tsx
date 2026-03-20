@@ -299,17 +299,15 @@ function DocumentViewer({
       {needsAction && (
         <div className="border-t border-border px-4 py-3 bg-background shrink-0">
           <p className="text-[11px] text-muted-foreground mb-2">This document needs your review.</p>
-          <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" className="h-8 text-xs flex-1 text-destructive hover:text-destructive" onClick={() => {
+          <div className="flex items-center gap-3">
+            <Button size="lg" className="h-11 px-8 text-base font-semibold flex-1 rounded-lg bg-green-700 hover:bg-green-800 text-white border-0" onClick={onApprove}>
+              Approve
+            </Button>
+            <Button size="lg" className="h-11 px-8 text-base font-semibold flex-1 rounded-lg bg-red-900 hover:bg-red-950 text-white border-0" onClick={() => {
               onReject?.();
               onBack();
             }}>
-              <XCircle className="h-3.5 w-3.5 mr-1" />
               Reject
-            </Button>
-            <Button size="sm" className="h-8 text-xs flex-1 bg-green-600 hover:bg-green-700 text-white" onClick={onApprove}>
-              <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-              Approve
             </Button>
           </div>
         </div>

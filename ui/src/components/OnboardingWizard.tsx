@@ -1103,18 +1103,17 @@ Follow this structure for every role in the plan.`,
                 </div>
               )}
 
-              {step === 1 && onboardingPath !== "grow" && (
+              {/* Step 1a: Name your company */}
+              {step === 1 && onboardingPath !== "grow" && !missionPath && (
                 <div className="space-y-5">
                   <div className="flex items-center gap-3 mb-1">
                     <div className="bg-muted/50 p-2">
                       <Building2 className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div>
-                      <h3 className="font-medium">{!missionPath ? "Name your company" : "Define your mission"}</h3>
+                      <h3 className="font-medium">Name your company</h3>
                       <p className="text-xs text-muted-foreground">
-                        {!missionPath
-                          ? "What will your company be called?"
-                          : "Your mission drives everything — your CEO, your hires, and the work your company will do."}
+                        What will your company be called?
                       </p>
                     </div>
                   </div>
@@ -1134,44 +1133,93 @@ Follow this structure for every role in the plan.`,
                       placeholder="Acme Corp"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      autoFocus={!missionPath}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && companyName.trim()) {
+                          e.preventDefault();
+                          setMissionPath("direct");
+                        }
+                      }}
+                      autoFocus
                     />
                   </div>
+                  <div className="flex items-center justify-between">
+                    <button
+                      className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => { setOnboardingPath(null); setStep(0); }}
+                    >
+                      ← Back to start
+                    </button>
+                    {companyName.trim() && (
+                      <Button
+                        size="sm"
+                        onClick={() => setMissionPath("direct")}
+                        className="gap-1.5"
+                      >
+                        Next
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
 
-                  {/* Mission path selector — only shows after company name is entered */}
-                  {!missionPath && companyName.trim() && (
-                    <div className="space-y-3">
-                      <label className="text-xs text-foreground block">
-                        How would you like to define your mission?
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          className="flex flex-col items-center gap-1.5 rounded-md border border-border p-3 text-xs hover:bg-accent/50 transition-colors"
-                          onClick={() => setMissionPath("direct")}
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          <span className="font-medium">I know my mission</span>
-                          <span className="text-muted-foreground text-[10px]">
-                            Type it directly
-                          </span>
-                        </button>
-                        <button
-                          className="flex flex-col items-center gap-1.5 rounded-md border border-border p-3 text-xs hover:bg-accent/50 transition-colors"
-                          onClick={() => setMissionPath("questionnaire")}
-                        >
-                          <ListTodo className="h-4 w-4" />
-                          <span className="font-medium">Help me figure it out</span>
-                          <span className="text-muted-foreground text-[10px]">
-                            Answer a few questions
-                          </span>
-                        </button>
-                      </div>
+              {/* Step 1b: Define your mission */}
+              {step === 1 && onboardingPath !== "grow" && missionPath && (
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="bg-muted/50 p-2">
+                      <Building2 className="h-5 w-5 text-muted-foreground" />
                     </div>
-                  )}
+                    <div>
+                      <h3 className="font-medium">Define your mission</h3>
+                      <p className="text-xs text-muted-foreground">
+                        Your mission drives everything — your CEO, your hires, and the work <strong>{companyName}</strong> will do.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Mission path selector */}
+                  <div className="space-y-3">
+                    <label className="text-xs text-foreground block">
+                      How would you like to define your mission?
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        className={cn(
+                          "flex flex-col items-center gap-1.5 rounded-md border p-3 text-xs transition-colors",
+                          missionPath === "direct"
+                            ? "border-foreground bg-accent/50"
+                            : "border-border hover:bg-accent/50"
+                        )}
+                        onClick={() => setMissionPath("direct")}
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        <span className="font-medium">I know my mission</span>
+                        <span className="text-muted-foreground text-[10px]">
+                          Type it directly
+                        </span>
+                      </button>
+                      <button
+                        className={cn(
+                          "flex flex-col items-center gap-1.5 rounded-md border p-3 text-xs transition-colors",
+                          missionPath === "questionnaire"
+                            ? "border-foreground bg-accent/50"
+                            : "border-border hover:bg-accent/50"
+                        )}
+                        onClick={() => setMissionPath("questionnaire")}
+                      >
+                        <ListTodo className="h-4 w-4" />
+                        <span className="font-medium">Help me figure it out</span>
+                        <span className="text-muted-foreground text-[10px]">
+                          Answer a few questions
+                        </span>
+                      </button>
+                    </div>
+                  </div>
 
                   {/* Direct mission input */}
                   {missionPath === "direct" && (
-                    <div className="space-y-3">
+                    <div className="space-y-3 animate-in fade-in duration-200">
                       <div className="group">
                         <label
                           className={cn(
@@ -1208,18 +1256,12 @@ Follow this structure for every role in the plan.`,
                           </button>
                         ))}
                       </div>
-                      <button
-                        className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-                        onClick={() => setMissionPath(null)}
-                      >
-                        ← Choose a different path
-                      </button>
                     </div>
                   )}
 
                   {/* Questionnaire path */}
                   {missionPath === "questionnaire" && !missionConfirmed && (
-                    <div className="space-y-3">
+                    <div className="space-y-3 animate-in fade-in duration-200">
                       <div className="group">
                         <label className="text-xs text-muted-foreground mb-1 block">
                           What does your company do?
@@ -1277,18 +1319,12 @@ Follow this structure for every role in the plan.`,
                           Generate my mission
                         </Button>
                       )}
-                      <button
-                        className="text-[11px] text-muted-foreground hover:text-foreground transition-colors block"
-                        onClick={() => setMissionPath(null)}
-                      >
-                        ← Choose a different path
-                      </button>
                     </div>
                   )}
 
                   {/* Questionnaire result — editable mission */}
                   {missionPath === "questionnaire" && missionConfirmed && (
-                    <div className="space-y-3">
+                    <div className="space-y-3 animate-in fade-in duration-200">
                       <div className="group">
                         <label className="text-xs text-foreground mb-1 block">
                           Here's your draft mission — edit it however you like:
@@ -1310,11 +1346,18 @@ Follow this structure for every role in the plan.`,
                   )}
 
                   {/* Confirm mission note */}
-                  {companyGoal.trim() && companyName.trim() && (
+                  {companyGoal.trim() && (
                     <p className="text-[11px] text-muted-foreground italic">
                       You can always change your mission later in settings.
                     </p>
                   )}
+
+                  <button
+                    className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setMissionPath(null)}
+                  >
+                    ← Change company name
+                  </button>
                 </div>
               )}
 
