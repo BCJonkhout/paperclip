@@ -33,4 +33,5 @@ export type TelemetryEventName =
   | "company.imported"
   | "agent.first_heartbeat"
   | "agent.task_completed"
-  | "error.handler_crash";
+  | "error.handler_crash"
+  | `plugin.${string}`;
