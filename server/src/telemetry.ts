@@ -21,6 +21,7 @@ export function initTelemetry(fileConfig?: { enabled?: boolean }): TelemetryClie
     () => loadOrCreateState(stateDir, serverVersion),
     serverVersion,
   );
+  client.startPeriodicFlush(60_000);
   return client;
 }
 

@@ -18,6 +18,7 @@ export class TelemetryClient {
   private readonly version: string;
   private readonly sessionId: string;
   private state: TelemetryState | null = null;
+  private flushInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(config: TelemetryConfig, stateFactory: () => TelemetryState, version: string) {
     this.config = config;
@@ -65,6 +66,24 @@ export class TelemetryClient {
       // Fire-and-forget: silent failure, no retries
     } finally {
       clearTimeout(timer);
+    }
+  }
+
+  startPeriodicFlush(intervalMs: number = 60_000): void {
+    if (this.flushInterval) return;
+    this.flushInterval = setInterval(() => {
+      void this.flush();
+    }, intervalMs);
+    // Allow the process to exit even if the interval is still active
+    if (typeof this.flushInterval === "object" && "unref" in this.flushInterval) {
+      this.flushInterval.unref();
+    }
+  }
+
+  stop(): void {
+    if (this.flushInterval) {
+      clearInterval(this.flushInterval);
+      this.flushInterval = null;
     }
   }
 
