@@ -8,17 +8,23 @@ export interface TelemetryState {
 export interface TelemetryConfig {
   enabled: boolean;
   endpoint?: string;
+  app?: string;
+  schemaVersion?: string;
 }
 
-export interface TelemetryEventEnvelope {
-  installId: string;
-  sessionId: string;
-  event: string;
+/** Per-event object inside the backend envelope */
+export interface TelemetryEvent {
+  name: string;
+  occurredAt: string;
   dimensions: Record<string, string | number | boolean>;
-  timestamp: string;
-  version: string;
-  os: string;
-  arch: string;
+}
+
+/** Full payload sent to the backend ingest endpoint */
+export interface TelemetryEventEnvelope {
+  app: string;
+  schemaVersion: string;
+  installId: string;
+  events: TelemetryEvent[];
 }
 
 export type TelemetryEventName =

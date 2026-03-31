@@ -100,7 +100,7 @@ describe("issue telemetry routes", () => {
 
     expect(res.status).toBe(200);
     expect(mockTrackAgentTaskCompleted).toHaveBeenCalledWith(expect.anything(), {
-      adapterType: "codex_local",
+      agentRole: "codex_local",
     });
   });
 

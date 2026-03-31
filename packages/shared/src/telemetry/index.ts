@@ -12,6 +12,7 @@ export {
 export type {
   TelemetryConfig,
   TelemetryState,
+  TelemetryEvent,
   TelemetryEventEnvelope,
   TelemetryEventName,
 } from "./types.js";

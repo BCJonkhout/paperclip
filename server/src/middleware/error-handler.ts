@@ -47,7 +47,7 @@ export function errorHandler(
         err,
       );
       const tc = getTelemetryClient();
-      if (tc) trackErrorHandlerCrash(tc, { errorName: err.name, route: req.route?.path ?? req.path, method: req.method });
+      if (tc) trackErrorHandlerCrash(tc, { errorCode: err.name });
     }
     res.status(err.status).json({
       error: err.message,
@@ -72,7 +72,7 @@ export function errorHandler(
   );
 
   const tc = getTelemetryClient();
-  if (tc) trackErrorHandlerCrash(tc, { errorName: rootError.name, route: req.route?.path ?? req.path, method: req.method });
+  if (tc) trackErrorHandlerCrash(tc, { errorCode: rootError.name });
 
   res.status(500).json({ error: "Internal server error" });
 }

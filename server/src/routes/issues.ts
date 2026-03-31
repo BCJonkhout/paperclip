@@ -1155,7 +1155,7 @@ export function issueRoutes(db: Db, storage: StorageService) {
       if (tc && actor.agentId) {
         const actorAgent = await agentsSvc.getById(actor.agentId);
         if (actorAgent) {
-          trackAgentTaskCompleted(tc, { adapterType: actorAgent.adapterType });
+          trackAgentTaskCompleted(tc, { agentRole: actorAgent.adapterType });
         }
       }
     }

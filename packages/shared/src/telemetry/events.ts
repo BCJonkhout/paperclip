@@ -1,14 +1,14 @@
 import type { TelemetryClient } from "./client.js";
 
-export function trackInstallStarted(client: TelemetryClient, dims: { setupMode: string }): void {
-  client.track("install.started", dims);
+export function trackInstallStarted(client: TelemetryClient): void {
+  client.track("install.started");
 }
 
 export function trackInstallCompleted(
   client: TelemetryClient,
-  dims: { setupMode: string; dbMode: string; deploymentMode: string },
+  dims: { adapterType: string },
 ): void {
-  client.track("install.completed", dims);
+  client.track("install.completed", { adapter_type: dims.adapterType });
 }
 
 export function trackCompanyImported(
@@ -17,33 +17,29 @@ export function trackCompanyImported(
 ): void {
   const ref = dims.isPrivate ? client.hashPrivateRef(dims.sourceRef) : dims.sourceRef;
   client.track("company.imported", {
-    sourceType: dims.sourceType,
-    sourceRef: ref,
-    sourceRefHashed: dims.isPrivate,
+    source_type: dims.sourceType,
+    source_ref: ref,
+    source_ref_hashed: dims.isPrivate,
   });
 }
 
 export function trackAgentFirstHeartbeat(
   client: TelemetryClient,
-  dims: { adapterType: string },
+  dims: { agentRole: string },
 ): void {
-  client.track("agent.first_heartbeat", dims);
+  client.track("agent.first_heartbeat", { agent_role: dims.agentRole });
 }
 
 export function trackAgentTaskCompleted(
   client: TelemetryClient,
-  dims: { adapterType: string },
+  dims: { agentRole: string },
 ): void {
-  client.track("agent.task_completed", dims);
+  client.track("agent.task_completed", { agent_role: dims.agentRole });
 }
 
 export function trackErrorHandlerCrash(
   client: TelemetryClient,
-  dims: { errorName: string; route: string; method: string },
+  dims: { errorCode: string },
 ): void {
-  client.track("error.handler_crash", {
-    errorName: dims.errorName,
-    route: dims.route,
-    method: dims.method,
-  });
+  client.track("error.handler_crash", { error_code: dims.errorCode });
 }

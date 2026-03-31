@@ -1832,7 +1832,7 @@ export function heartbeatService(db: Db) {
 
     if (isFirstHeartbeat && updated) {
       const tc = getTelemetryClient();
-      if (tc) trackAgentFirstHeartbeat(tc, { adapterType: updated.adapterType });
+      if (tc) trackAgentFirstHeartbeat(tc, { agentRole: updated.adapterType });
     }
 
     if (updated) {

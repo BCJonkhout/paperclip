@@ -359,7 +359,7 @@ export async function onboard(opts: OnboardOptions): Promise<void> {
   }
 
   const tc = getTelemetryClient();
-  if (tc) trackInstallStarted(tc, { setupMode });
+  if (tc) trackInstallStarted(tc);
 
   let llm: PaperclipConfig["llm"] | undefined;
   const { defaults: derivedDefaults, usedEnvKeys, ignoredEnvKeys } = quickstartDefaultsFromEnv();
@@ -510,9 +510,7 @@ export async function onboard(opts: OnboardOptions): Promise<void> {
   writeConfig(config, opts.config);
 
   if (tc) trackInstallCompleted(tc, {
-    setupMode,
-    dbMode: database.mode,
-    deploymentMode: server.deploymentMode,
+    adapterType: server.deploymentMode,
   });
 
   p.note(
