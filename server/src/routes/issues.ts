@@ -16,6 +16,8 @@ import {
   upsertIssueDocumentSchema,
   updateIssueSchema,
 } from "@paperclipai/shared";
+import { trackAgentTaskCompleted } from "@paperclipai/shared/telemetry";
+import { getTelemetryClient } from "../telemetry.js";
 import type { StorageService } from "../storage/types.js";
 import { validate } from "../middleware/validate.js";
 import {
@@ -1147,6 +1149,16 @@ export function issueRoutes(db: Db, storage: StorageService) {
         _previous: hasFieldChanges ? previous : undefined,
       },
     });
+
+    if (issue.status === "done" && existing.status !== "done") {
+      const tc = getTelemetryClient();
+      if (tc && actor.agentId) {
+        const actorAgent = await agentsSvc.getById(actor.agentId);
+        if (actorAgent) {
+          trackAgentTaskCompleted(tc, { adapterType: actorAgent.adapterType });
+        }
+      }
+    }
 
     let comment = null;
     if (commentBody) {
