@@ -3,6 +3,11 @@ export type AuthSession = {
   user: { id: string; email: string | null; name: string | null };
 };
 
+export type OAuthSignInResponse = {
+  url: string;
+  redirect: boolean;
+};
+
 function toSession(value: unknown): AuthSession | null {
   if (!value || typeof value !== "object") return null;
   const record = value as Record<string, unknown>;
@@ -66,6 +71,24 @@ export const authApi = {
 
   signUpEmail: async (input: { name: string; email: string; password: string }) => {
     await authPost("/sign-up/email", input);
+  },
+
+  signInKeycloak: async (input: {
+    callbackURL?: string;
+    errorCallbackURL?: string;
+    newUserCallbackURL?: string;
+  }): Promise<OAuthSignInResponse> => {
+    const payload = await authPost("/sign-in/oauth2", {
+      providerId: "keycloak",
+      ...input,
+    }) as Partial<OAuthSignInResponse> | null;
+    if (!payload?.url || typeof payload.url !== "string") {
+      throw new Error("Invalid Keycloak sign-in response");
+    }
+    return {
+      url: payload.url,
+      redirect: payload.redirect !== false,
+    };
   },
 
   signOut: async () => {

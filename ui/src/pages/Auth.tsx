@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "@/lib/router";
 import { authApi } from "../api/auth";
+import { healthApi } from "../api/health";
 import { queryKeys } from "../lib/queryKeys";
 import { Button } from "@/components/ui/button";
 import { AsciiArtAnimation } from "@/components/AsciiArtAnimation";
@@ -20,6 +21,19 @@ export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
 
   const nextPath = useMemo(() => searchParams.get("next") || "/", [searchParams]);
+  const absoluteNextUrl = useMemo(() => {
+    if (typeof window === "undefined") return nextPath;
+    return new URL(nextPath, window.location.origin).toString();
+  }, [nextPath]);
+  const absoluteAuthUrl = useMemo(() => {
+    if (typeof window === "undefined") return `/auth?next=${encodeURIComponent(nextPath)}`;
+    return new URL(`/auth?next=${encodeURIComponent(nextPath)}`, window.location.origin).toString();
+  }, [nextPath]);
+  const healthQuery = useQuery({
+    queryKey: queryKeys.health,
+    queryFn: () => healthApi.get(),
+    retry: false,
+  });
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: queryKeys.auth.session,
     queryFn: () => authApi.getSession(),
@@ -59,6 +73,23 @@ export function AuthPage() {
     email.trim().length > 0 &&
     password.trim().length > 0 &&
     (mode === "sign_in" || (name.trim().length > 0 && password.trim().length >= 8));
+  const keycloakAuthEnabled = healthQuery.data?.features?.keycloakAuthEnabled === true;
+
+  async function handleKeycloakSignIn() {
+    try {
+      setError(null);
+      const result = await authApi.signInKeycloak({
+        callbackURL: absoluteNextUrl,
+        errorCallbackURL: absoluteAuthUrl,
+        newUserCallbackURL: absoluteNextUrl,
+      });
+      if (typeof window !== "undefined") {
+        window.location.assign(result.url);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "SSO sign-in failed");
+    }
+  }
 
   if (isSessionLoading) {
     return (
@@ -86,6 +117,24 @@ export function AuthPage() {
               ? "Use your email and password to access this instance."
               : "Create an account for this instance. Email confirmation is not required in v1."}
           </p>
+
+          {mode === "sign_in" && keycloakAuthEnabled && (
+            <>
+              <Button
+                type="button"
+                className="mt-6 w-full"
+                variant="outline"
+                onClick={() => void handleKeycloakSignIn()}
+              >
+                Sign in with SSO
+              </Button>
+              <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="h-px flex-1 bg-border" />
+                <span>or continue with email</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+            </>
+          )}
 
           <form
             className="mt-6 space-y-4"
