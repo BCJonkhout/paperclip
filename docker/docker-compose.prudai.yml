@@ -1,0 +1,23 @@
+services:
+  paperclip:
+    container_name: paperclip-prudai
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - /etc/paperclip/paperclip.env
+      - /root/.codex/secrets/claw-gemini.env
+    ports:
+      - "127.0.0.1:${PAPERCLIP_HOST_PORT:-13100}:3100"
+    environment:
+      HOST: "0.0.0.0"
+      PAPERCLIP_HOME: "/paperclip"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
+      PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
+      PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL}"
+      BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET}"
+    volumes:
+      - "${PAPERCLIP_DATA_DIR:-../data/paperclip-prudai}:/paperclip"
