@@ -56,6 +56,12 @@ export const authConfigSchema = z.object({
   baseUrlMode: z.enum(AUTH_BASE_URL_MODES).default("auto"),
   publicBaseUrl: z.string().url().optional(),
   disableSignUp: z.boolean().default(false),
+  keycloak: z.object({
+    enabled: z.boolean().default(false),
+    issuer: z.string().url().optional(),
+    clientId: z.string().min(1).optional(),
+    clientSecret: z.string().optional(),
+  }).optional(),
 });
 
 export const storageLocalDiskConfigSchema = z.object({

@@ -50,6 +50,10 @@ export interface Config {
   authBaseUrlMode: AuthBaseUrlMode;
   authPublicBaseUrl: string | undefined;
   authDisableSignUp: boolean;
+  authKeycloakEnabled: boolean;
+  authKeycloakIssuer: string | undefined;
+  authKeycloakClientId: string | undefined;
+  authKeycloakClientSecret: string | undefined;
   databaseMode: DatabaseMode;
   databaseUrl: string | undefined;
   embeddedPostgresDataDir: string;
@@ -160,6 +164,22 @@ export function loadConfig(): Config {
     disableSignUpFromEnv !== undefined
       ? disableSignUpFromEnv === "true"
       : (fileConfig?.auth?.disableSignUp ?? false);
+  const authKeycloakEnabled =
+    process.env.PAPERCLIP_AUTH_KEYCLOAK_ENABLED !== undefined
+      ? process.env.PAPERCLIP_AUTH_KEYCLOAK_ENABLED === "true"
+      : (fileConfig?.auth?.keycloak?.enabled ?? false);
+  const authKeycloakIssuer =
+    process.env.PAPERCLIP_AUTH_KEYCLOAK_ISSUER?.trim() ||
+    fileConfig?.auth?.keycloak?.issuer?.trim() ||
+    undefined;
+  const authKeycloakClientId =
+    process.env.PAPERCLIP_AUTH_KEYCLOAK_CLIENT_ID?.trim() ||
+    fileConfig?.auth?.keycloak?.clientId?.trim() ||
+    undefined;
+  const authKeycloakClientSecret =
+    process.env.PAPERCLIP_AUTH_KEYCLOAK_CLIENT_SECRET ??
+    fileConfig?.auth?.keycloak?.clientSecret ??
+    undefined;
   const allowedHostnamesFromEnvRaw = process.env.PAPERCLIP_ALLOWED_HOSTNAMES;
   const allowedHostnamesFromEnv = allowedHostnamesFromEnvRaw
     ? allowedHostnamesFromEnvRaw
@@ -222,6 +242,10 @@ export function loadConfig(): Config {
     authBaseUrlMode,
     authPublicBaseUrl,
     authDisableSignUp,
+    authKeycloakEnabled,
+    authKeycloakIssuer,
+    authKeycloakClientId,
+    authKeycloakClientSecret,
     databaseMode: fileDatabaseMode,
     databaseUrl: process.env.DATABASE_URL ?? fileDbUrl,
     embeddedPostgresDataDir: resolveHomeAwarePath(

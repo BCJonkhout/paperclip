@@ -3,6 +3,7 @@ import type { IncomingHttpHeaders } from "node:http";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { toNodeHandler } from "better-auth/node";
+import { genericOAuth, keycloak } from "better-auth/plugins";
 import type { Db } from "@paperclipai/db";
 import {
   authAccounts,
@@ -72,6 +73,12 @@ export function createBetterAuthInstance(db: Db, config: Config, trustedOrigins?
 
   const publicUrl = process.env.PAPERCLIP_PUBLIC_URL ?? baseUrl;
   const isHttpOnly = publicUrl ? publicUrl.startsWith("http://") : false;
+  const keycloakAuthConfigured =
+    config.authKeycloakEnabled &&
+    typeof config.authKeycloakIssuer === "string" &&
+    config.authKeycloakIssuer.length > 0 &&
+    typeof config.authKeycloakClientId === "string" &&
+    config.authKeycloakClientId.length > 0;
 
   const authConfig = {
     baseURL: baseUrl,
@@ -91,6 +98,20 @@ export function createBetterAuthInstance(db: Db, config: Config, trustedOrigins?
       requireEmailVerification: false,
       disableSignUp: config.authDisableSignUp,
     },
+    plugins: keycloakAuthConfigured
+      ? [
+          genericOAuth({
+            config: [
+              keycloak({
+                issuer: config.authKeycloakIssuer!,
+                clientId: config.authKeycloakClientId!,
+                clientSecret: config.authKeycloakClientSecret ?? "",
+                pkce: true,
+              }),
+            ],
+          }),
+        ]
+      : [],
     ...(isHttpOnly ? { advanced: { useSecureCookies: false } } : {}),
   };
 

@@ -526,6 +526,10 @@ export async function startServer(): Promise<StartedServer> {
     bindHost: config.host,
     authReady,
     companyDeletionEnabled: config.companyDeletionEnabled,
+    keycloakAuthEnabled:
+      config.authKeycloakEnabled &&
+      Boolean(config.authKeycloakIssuer) &&
+      Boolean(config.authKeycloakClientId),
     betterAuthHandler,
     resolveSession,
   });
