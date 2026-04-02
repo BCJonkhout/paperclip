@@ -1,7 +1,7 @@
 {
-  "pid": 495972,
+  "pid": 1214276,
   "parent_pid": 2757671,
-  "started_at": "2026-04-02T11:32:55.816Z",
+  "started_at": "2026-04-02T14:24:26.566Z",
   "cwd": "/root/paperclip",
   "notify_script": "/usr/local/lib/node_modules/oh-my-codex/dist/scripts/notify-hook.js",
   "poll_ms": 75,
@@ -14,7 +14,7 @@
     "max_per_tick": 5,
     "run_count": 1,
     "leader_only": true,
-    "last_tick_at": "2026-04-02T11:32:55.826Z",
+    "last_tick_at": "2026-04-02T14:24:26.575Z",
     "last_result": {
       "processed": 0,
       "skipped": 0,
@@ -26,8 +26,8 @@
     "enabled": true,
     "leader_only": true,
     "stale_threshold_ms": 180000,
-    "precomputed_leader_stale": false,
-    "last_tick_at": "2026-04-02T11:32:55.828Z",
+    "precomputed_leader_stale": true,
+    "last_tick_at": "2026-04-02T14:24:26.576Z",
     "last_error": null,
     "run_count": 1
   },
@@ -36,7 +36,7 @@
     "cadence_ms": 60000,
     "message": "Ralph loop active continue",
     "active": false,
-    "last_state_check_at": "2026-04-02T11:32:55.866Z",
+    "last_state_check_at": "2026-04-02T14:24:26.601Z",
     "last_sent_at": "",
     "cooldown_anchor_at": "",
     "last_reason": "cleared",
@@ -52,7 +52,7 @@
   "fallback_auto_nudge": {
     "enabled": true,
     "stall_ms": 5000,
-    "last_tick_at": "2026-04-02T11:32:55.864Z",
+    "last_tick_at": "2026-04-02T14:24:26.600Z",
     "last_turn_at": "",
     "last_turn_count": null,
     "last_message": "",
