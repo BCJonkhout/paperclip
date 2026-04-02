@@ -16,6 +16,7 @@ interface AgentPropertiesProps {
 
 const adapterLabels: Record<string, string> = {
   claude_local: "Claude (local)",
+  claw_local: "Claw Code (local)",
   codex_local: "Codex (local)",
   gemini_local: "Gemini CLI (local)",
   opencode_local: "OpenCode (local)",
