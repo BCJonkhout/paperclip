@@ -82,10 +82,11 @@ describe("issue telemetry routes", () => {
     }));
   });
 
-  it("emits task-completed telemetry with the agent adapter type", async () => {
+  it("emits task-completed telemetry with the agent role", async () => {
     mockAgentService.getById.mockResolvedValue({
       id: "agent-1",
       companyId: "company-1",
+      role: "engineer",
       adapterType: "codex_local",
     });
 
@@ -100,7 +101,7 @@ describe("issue telemetry routes", () => {
 
     expect(res.status).toBe(200);
     expect(mockTrackAgentTaskCompleted).toHaveBeenCalledWith(expect.anything(), {
-      agentRole: "codex_local",
+      agentRole: "engineer",
     });
   });
 
