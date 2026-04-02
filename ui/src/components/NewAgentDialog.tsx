@@ -25,6 +25,7 @@ import { HermesIcon } from "./HermesIcon";
 
 type AdvancedAdapterType =
   | "claude_local"
+  | "claw_local"
   | "codex_local"
   | "gemini_local"
   | "opencode_local"
@@ -46,6 +47,12 @@ const ADVANCED_ADAPTER_OPTIONS: Array<{
     icon: Sparkles,
     desc: "Local Claude agent",
     recommended: true,
+  },
+  {
+    value: "claw_local",
+    label: "Claw Code",
+    icon: Code,
+    desc: "Local Claw coding agent",
   },
   {
     value: "codex_local",

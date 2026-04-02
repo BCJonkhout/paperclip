@@ -83,7 +83,7 @@ type StagedIssueFile = {
   title?: string | null;
 };
 
-const ISSUE_OVERRIDE_ADAPTER_TYPES = new Set(["claude_local", "codex_local", "opencode_local"]);
+const ISSUE_OVERRIDE_ADAPTER_TYPES = new Set(["claude_local", "claw_local", "codex_local", "opencode_local"]);
 const STAGED_FILE_ACCEPT = "image/*,application/pdf,text/plain,text/markdown,application/json,text/csv,text/html,.md,.markdown";
 
 const ISSUE_THINKING_EFFORT_OPTIONS = {
@@ -578,6 +578,8 @@ export function NewIssueDialog() {
         ? ISSUE_THINKING_EFFORT_OPTIONS.codex_local
         : assigneeAdapterType === "opencode_local"
           ? ISSUE_THINKING_EFFORT_OPTIONS.opencode_local
+          : assigneeAdapterType === "claw_local"
+            ? [{ value: "", label: "Default" }]
           : ISSUE_THINKING_EFFORT_OPTIONS.claude_local;
     if (!validThinkingValues.some((option) => option.value === assigneeThinkingEffort)) {
       setAssigneeThinkingEffort("");
@@ -775,6 +777,8 @@ export function NewIssueDialog() {
   const assigneeOptionsTitle =
     assigneeAdapterType === "claude_local"
       ? "Claude options"
+      : assigneeAdapterType === "claw_local"
+        ? "Claw options"
       : assigneeAdapterType === "codex_local"
         ? "Codex options"
         : assigneeAdapterType === "opencode_local"
@@ -785,6 +789,8 @@ export function NewIssueDialog() {
       ? ISSUE_THINKING_EFFORT_OPTIONS.codex_local
       : assigneeAdapterType === "opencode_local"
         ? ISSUE_THINKING_EFFORT_OPTIONS.opencode_local
+      : assigneeAdapterType === "claw_local"
+        ? [{ value: "", label: "Default" }]
       : ISSUE_THINKING_EFFORT_OPTIONS.claude_local;
   const recentAssigneeIds = useMemo(() => getRecentAssigneeIds(), [newIssueOpen]);
   const assigneeOptions = useMemo<InlineEntityOption[]>(
@@ -1187,23 +1193,25 @@ export function NewIssueDialog() {
                     onChange={setAssigneeModelOverride}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <div className="text-xs text-muted-foreground">Thinking effort</div>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {thinkingEffortOptions.map((option) => (
-                      <button
-                        key={option.value || "default"}
-                        className={cn(
-                          "px-2 py-1 rounded-md text-xs border border-border hover:bg-accent/50 transition-colors",
-                          assigneeThinkingEffort === option.value && "bg-accent"
-                        )}
-                        onClick={() => setAssigneeThinkingEffort(option.value)}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
+                {assigneeAdapterType !== "claw_local" && (
+                  <div className="space-y-1.5">
+                    <div className="text-xs text-muted-foreground">Thinking effort</div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {thinkingEffortOptions.map((option) => (
+                        <button
+                          key={option.value || "default"}
+                          className={cn(
+                            "px-2 py-1 rounded-md text-xs border border-border hover:bg-accent/50 transition-colors",
+                            assigneeThinkingEffort === option.value && "bg-accent"
+                          )}
+                          onClick={() => setAssigneeThinkingEffort(option.value)}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 {assigneeAdapterType === "claude_local" && (
                   <div className="flex items-center justify-between rounded-md border border-border px-2 py-1.5">
                     <div className="text-xs text-muted-foreground">Enable Chrome (--chrome)</div>

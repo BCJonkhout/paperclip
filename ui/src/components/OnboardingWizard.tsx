@@ -61,6 +61,7 @@ import { HermesIcon } from "./HermesIcon";
 type Step = 1 | 2 | 3 | 4;
 type AdapterType =
   | "claude_local"
+  | "claw_local"
   | "codex_local"
   | "gemini_local"
   | "hermes_local"
@@ -208,6 +209,7 @@ export function OnboardingWizard() {
   });
   const isLocalAdapter =
     adapterType === "claude_local" ||
+    adapterType === "claw_local" ||
     adapterType === "codex_local" ||
     adapterType === "gemini_local" ||
     adapterType === "hermes_local" ||
@@ -218,6 +220,8 @@ export function OnboardingWizard() {
     command.trim() ||
     (adapterType === "codex_local"
       ? "codex"
+      : adapterType === "claw_local"
+        ? "claw"
       : adapterType === "gemini_local"
         ? "gemini"
       : adapterType === "hermes_local"
@@ -825,6 +829,12 @@ export function OnboardingWizard() {
                       <div className="grid grid-cols-2 gap-2 mt-2">
                         {[
                           {
+                            value: "claw_local" as const,
+                            label: "Claw Code",
+                            icon: Code,
+                            desc: "Local Claw coding agent"
+                          },
+                          {
                             value: "gemini_local" as const,
                             label: "Gemini CLI",
                             icon: Gem,
@@ -1087,6 +1097,8 @@ export function OnboardingWizard() {
                           <p className="text-muted-foreground font-mono break-all">
                             {adapterType === "cursor"
                               ? `${effectiveAdapterCommand} -p --mode ask --output-format json \"Respond with hello.\"`
+                              : adapterType === "claw_local"
+                                ? `${effectiveAdapterCommand} --output-format json prompt "Respond with hello."`
                               : adapterType === "codex_local"
                               ? `${effectiveAdapterCommand} exec --json -`
                               : adapterType === "gemini_local"
@@ -1100,6 +1112,7 @@ export function OnboardingWizard() {
                             <span className="font-mono">Respond with hello.</span>
                           </p>
                           {adapterType === "cursor" ||
+                          adapterType === "claw_local" ||
                           adapterType === "codex_local" ||
                           adapterType === "gemini_local" ||
                           adapterType === "opencode_local" ? (
@@ -1108,6 +1121,8 @@ export function OnboardingWizard() {
                               <span className="font-mono">
                                 {adapterType === "cursor"
                                   ? "CURSOR_API_KEY"
+                                  : adapterType === "claw_local"
+                                    ? "the provider credentials used by your Claw profile"
                                   : adapterType === "gemini_local"
                                     ? "GEMINI_API_KEY"
                                     : "OPENAI_API_KEY"}
@@ -1116,6 +1131,8 @@ export function OnboardingWizard() {
                               <span className="font-mono">
                                 {adapterType === "cursor"
                                   ? "agent login"
+                                  : adapterType === "claw_local"
+                                    ? "claw login"
                                   : adapterType === "codex_local"
                                     ? "codex login"
                                     : adapterType === "gemini_local"

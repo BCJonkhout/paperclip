@@ -313,6 +313,7 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
     : overlay.adapterType ?? props.agent.adapterType;
   const isLocal =
     adapterType === "claude_local" ||
+    adapterType === "claw_local" ||
     adapterType === "codex_local" ||
     adapterType === "gemini_local" ||
     adapterType === "hermes_local" ||
@@ -438,7 +439,7 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
       : adapterType === "opencode_local"
         ? eff("adapterConfig", "variant", String(config.variant ?? ""))
       : eff("adapterConfig", "effort", String(config.effort ?? ""));
-  const showThinkingEffort = adapterType !== "gemini_local";
+  const showThinkingEffort = adapterType !== "gemini_local" && adapterType !== "claw_local";
   const codexSearchEnabled = adapterType === "codex_local"
     ? (isCreate ? Boolean(val!.search) : eff("adapterConfig", "search", Boolean(config.search)))
     : false;
@@ -751,7 +752,7 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
                 allowDefault={adapterType !== "opencode_local" && adapterType !== "hermes_local"}
                 required={adapterType === "opencode_local" || adapterType === "hermes_local"}
                 groupByProvider={adapterType === "opencode_local"}
-                creatable={adapterType === "hermes_local"}
+                creatable={adapterType === "hermes_local" || adapterType === "claw_local"}
                 detectedModel={adapterType === "hermes_local" ? detectedModel : null}
                 onDetectModel={adapterType === "hermes_local"
                   ? async () => {
@@ -1024,7 +1025,7 @@ function AdapterEnvironmentResult({ result }: { result: AdapterEnvironmentTestRe
 
 /* ---- Internal sub-components ---- */
 
-const ENABLED_ADAPTER_TYPES = new Set(["claude_local", "codex_local", "gemini_local", "opencode_local", "pi_local", "cursor", "hermes_local"]);
+const ENABLED_ADAPTER_TYPES = new Set(["claude_local", "claw_local", "codex_local", "gemini_local", "opencode_local", "pi_local", "cursor", "hermes_local"]);
 
 /** Display list includes all real adapter types plus UI-only coming-soon entries. */
 const ADAPTER_DISPLAY_LIST: { value: string; label: string; comingSoon: boolean }[] = [

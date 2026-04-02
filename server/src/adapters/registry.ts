@@ -10,6 +10,11 @@ import {
 } from "@paperclipai/adapter-claude-local/server";
 import { agentConfigurationDoc as claudeAgentConfigurationDoc, models as claudeModels } from "@paperclipai/adapter-claude-local";
 import {
+  execute as clawExecute,
+  testEnvironment as clawTestEnvironment,
+} from "@paperclipai/adapter-claw-local/server";
+import { agentConfigurationDoc as clawAgentConfigurationDoc, models as clawModels } from "@paperclipai/adapter-claw-local";
+import {
   execute as codexExecute,
   listCodexSkills,
   syncCodexSkills,
@@ -94,6 +99,15 @@ const claudeLocalAdapter: ServerAdapterModule = {
   supportsLocalAgentJwt: true,
   agentConfigurationDoc: claudeAgentConfigurationDoc,
   getQuotaWindows: claudeGetQuotaWindows,
+};
+
+const clawLocalAdapter: ServerAdapterModule = {
+  type: "claw_local",
+  execute: clawExecute,
+  testEnvironment: clawTestEnvironment,
+  models: clawModels,
+  supportsLocalAgentJwt: true,
+  agentConfigurationDoc: clawAgentConfigurationDoc,
 };
 
 const codexLocalAdapter: ServerAdapterModule = {
@@ -191,6 +205,7 @@ const hermesLocalAdapter: ServerAdapterModule = {
 const adaptersByType = new Map<string, ServerAdapterModule>(
   [
     claudeLocalAdapter,
+    clawLocalAdapter,
     codexLocalAdapter,
     openCodeLocalAdapter,
     piLocalAdapter,

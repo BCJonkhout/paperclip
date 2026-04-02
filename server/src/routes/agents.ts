@@ -66,6 +66,7 @@ import {
 export function agentRoutes(db: Db) {
   const DEFAULT_INSTRUCTIONS_PATH_KEYS: Record<string, string> = {
     claude_local: "instructionsFilePath",
+    claw_local: "instructionsFilePath",
     codex_local: "instructionsFilePath",
     gemini_local: "instructionsFilePath",
     opencode_local: "instructionsFilePath",
@@ -392,6 +393,15 @@ export function agentRoutes(db: Db) {
         typeof next.dangerouslyBypassSandbox === "boolean";
       if (!hasBypassFlag) {
         next.dangerouslyBypassApprovalsAndSandbox = DEFAULT_CODEX_LOCAL_BYPASS_APPROVALS_AND_SANDBOX;
+      }
+      return ensureGatewayDeviceKey(adapterType, next);
+    }
+    if (adapterType === "claw_local") {
+      if (typeof next.dangerouslySkipPermissions !== "boolean") {
+        next.dangerouslySkipPermissions = true;
+      }
+      if (!asNonEmptyString(next.permissionMode)) {
+        next.permissionMode = "workspace-write";
       }
       return ensureGatewayDeviceKey(adapterType, next);
     }
